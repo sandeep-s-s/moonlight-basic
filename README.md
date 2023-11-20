@@ -17,3 +17,4 @@ $ pipenv shell
 $ pipenv install -r ./requirements.txt
 $ ./manage.py runserver
 ```
+* This will start development server at http://127.0.0.1:8000/
