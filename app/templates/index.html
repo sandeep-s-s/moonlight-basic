@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Moonlight</title>
+    {% load bootstrap5 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css"
+        integrity="sha384-b6lVK+yci+bfDmaY1u0zE8YYJt0TZxLEAFyYSLHId4xoVvsrQu3INevFKo+Xir8e" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <style>
+        body {
+            min-height: 100vh;
+            position: relative;
+            margin: 0;
+            padding-bottom: 100px;
+            box-sizing: border-box;
+        }
+
+        footer {
+            position: absolute;
+            bottom: 0;
+            height: 100px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="m-2">
+            <a class="navbar-brand" href="#">
+                      <img src="https://getbootstrap.com/docs/5.0/assets/brand/bootstrap-logo.svg" alt="" width="30" height="24" class="d-inline-block align-text-top">
+                Moonlight</a>
+        </div>
+            <button class="navbar-toggler" type="button" id="darkModeToggle" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Login</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <!-- Body -->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-8">
+                <form id="appForm">
+                    <div class="row">
+                        <!-- Http Method Menu -->
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <select class="form-control" id="method" name="method">
+                                    <option value="GET">GET</option>
+                                    <option value="POST">POST</option>
+                                    <option value="PUT">PUT</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- URL -->
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="URL" name="url"
+                                    value="https://httpbin.org/get">
+                                <div class="input-group-append">
+                                    <button class="btn btn-success" type="button" id="submitBtn">Send</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container mt-5">
+                        <ul class="nav nav-tabs" id="myTabs">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="request-parameter" data-bs-toggle="tab"
+                                    href="#tab-parameter">Parameter</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="request-body" data-bs-toggle="tab" href="#tab-body">Body</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="request-headers" data-bs-toggle="tab"
+                                    href="#tab-headers">Headers</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="request-auth" data-bs-toggle="tab" href="#tab-auth">Auth</a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="tab-parameter">
+                                <div class="container mt-5 d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <button class="btn btn-primary btn-sm"
+                                        onclick="addNewTextBox('textbox-container','param_key','param_value');return false;">Add
+                                        New</button>
+                                    <button class="btn btn-danger btn-sm"
+                                        onclick="deleteSelected('textbox-container');return false;">Delete
+                                        Selected</button>
+                                </div>
+                                <div id="textbox-container">
+                                    <!-- Existing textboxes go here if any -->
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="tab-body">
+                                <div class="col-6 m-3">
+                                    <textarea class="form-control" id="requestBody" name="request_body"
+                                        rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="tab-headers">
+                                <div class="container mt-5 d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <button class="btn btn-primary btn-sm"
+                                        onclick="addNewTextBox('requestBodyAuthContainer','header_key','header_value');return false;">Add
+                                        New</button>
+                                    <button class="btn btn-danger btn-sm"
+                                        onclick="deleteSelected('requestBodyAuthContainer');return false;">Delete
+                                        Selected</button>
+                                </div>
+                                <div id="requestBodyAuthContainer">
+                                    <!-- Existing textboxes go here if any -->
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="tab-auth">
+                                <div class="col-6 m-3">
+                                    <div class="mb-3">
+                                        <label for="authMethod" class="form-label">Authentication Type:</label>
+                                        <select class="form-select" id="authMethod" onchange="handleAuthMethod()"
+                                            name="auth_type">
+                                            <option value="noAuth">No Auth</option>
+                                            <option value="basicAuth">Basic Auth</option>
+                                            <option value="bearerToken">Bearer Token</option>
+                                        </select>
+                                    </div>
+                                    <div id="usernamePasswordFields" class="mb-3" style="display: none;">
+                                        <label for="username" class="form-label">Username:</label>
+                                        <input type="text" class="form-control" id="basidUserName"
+                                            name="basic_username">
+
+                                        <label for="password" class="form-label">Password:</label>
+                                        <input type="text" class="form-control" id="basicPassword"
+                                            name="basic_password">
+                                    </div>
+
+                                    <div id="tokenField" class="mb-3" style="display: none;">
+                                        <label for="token" class="form-label">Token:</label>
+                                        <input type="text" class="form-control" id="bearerToken" name="bearer_token">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-4">
+                <div class="mt-5">
+                    <h6>Response</h6>
+                    <ul class="nav nav-tabs" id="myTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="response-json" data-bs-toggle="tab"
+                                href="#tab-json">Response</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="response-header" data-bs-toggle="tab" href="#tab-header">Headers</a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="tab-json">
+                            <!-- API Response Display Block -->
+                            <div id="apiResponseBlock" class="m-2">
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="tab-header">
+                            <!-- API Header Display Block -->
+                            <div id="apiHeaderBlock" class="m-2">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="text-center">About</p>
+                </div>
+
+            </div>
+        </div>
+    </footer>
+
+</body>
+<script>
+    $(document).ready(function () {
+        $("#submitBtn").on('click', function () {
+            $.ajax({
+                type: 'POST',
+                url: '{% url "index-action" %}',
+                data: $('#appForm').serialize(),
+                success: function (response) {
+                    // Check if the API request was successful
+                    if (response.status === 'success') {
+                        // Update the content of the API response block with the data
+                        $('#apiResponseBlock').html('<pre>' + JSON.stringify(response.data, null, 2) + '</pre>');
+                        $('#apiHeaderBlock').html('<pre>' + JSON.stringify(response.headers, null, 2) + '</pre>');
+                    } else {
+                        // Handle the case where the API request was not successful
+                        $('#apiResponseBlock').html('<p>Error: ' + response.message + '</p>');
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        });
+        // Trigger the function on page load
+        handleAuthMethod();
+
+        // Bind the function to the change event of the select box
+        $("#authMethod").on("change", handleAuthMethod);
+    });
+</script>
+
+<script>
+    function addNewTextBox(root, param_key, param_value) {
+        var container = $("#" + root);
+
+        // Create a container div for each input group
+        var groupDiv = $("<div>").addClass("input-group mb-3");
+
+        // Create a checkbox
+        var checkbox = $("<input>").attr({
+            type: "checkbox",
+            class: "form-check-input m-2",
+            name: "selected[]"
+        });
+
+        // Create new key input
+        var keyInput = $("<input>").attr({
+            type: "text",
+            name: param_key,
+            class: "form-control m-2 form-control-sm",
+            placeholder: "Enter key"
+        });
+
+        // Create new value input
+        var valueInput = $("<input>").attr({
+            type: "text",
+            name: param_value,
+            class: "form-control m-2 form-control-sm",
+            placeholder: "Enter value"
+        });
+
+        // Create a "Delete" button
+        var deleteButton = $("<button>").html('<i class="bi bi-archive-fill"></i>').addClass("btn btn-outline-danger btn-sm form-control-sm");
+        deleteButton.on("click", function () {
+            deleteTextBox(groupDiv);
+        });
+
+        // Append checkbox, inputs, and the "Delete" button to the container div
+        groupDiv.append(keyInput, valueInput, checkbox, deleteButton);
+
+        // Append the container div to the main container
+        container.append(groupDiv);
+
+        // Add spacing between input groups
+        container.append($("<hr>"));
+    }
+
+    function deleteTextBox(groupDiv) {
+        var container = $("#textbox-container");
+
+        // Remove the parent div (which is the container for the input group)
+        groupDiv.remove();
+
+        // Remove the horizontal line between input groups
+        var hrElements = container.find("hr");
+        if (hrElements.length > 0) {
+            hrElements.last().remove();
+        }
+    }
+
+    function deleteSelected(root) {
+        var container = $("#" + root);
+        var checkboxes = $('input[name="selected[]"]:checked');
+
+        checkboxes.each(function () {
+            // Get the parent div of the checkbox (which is the container for the input group)
+            var groupDiv = $(this).parent();
+
+            // Remove the parent div from the main container
+            groupDiv.remove();
+
+            // Remove the horizontal line between input groups
+            var hrElements = container.find("hr");
+            if (hrElements.length > 0) {
+                hrElements.last().remove();
+            }
+        });
+    }
+
+    // This if for Auth selection handle No-auth , Basic auth , Bearer token
+    function handleAuthMethod() {
+        var authMethod = $("#authMethod").val();
+
+        // Hide all input fields initially
+        $("#usernamePasswordFields, #tokenField").hide();
+
+        // Show input fields based on selected authentication method
+        if (authMethod === "basicAuth") {
+            $("#usernamePasswordFields").show();
+        } else if (authMethod === "bearerToken") {
+            $("#tokenField").show();
+        }
+    }
+
+</script>
+
+</html>
